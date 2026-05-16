@@ -46,6 +46,15 @@ COMPLAINT_SIGNALS = [
     "open drain", "no water", "no electricity", "power cut", "water cut",
     # Question/rant markers
     "wtf", "seriously", "smh", "rant", "issue", "problem", "concern",
+    # Casual Reddit frustration language
+    "why tf", "how long", "pathetic state", "no one cares", "please fix",
+    "raise complaint", "filed complaint", "no response", "disappointed",
+    "shocking", "outrageous", "unbearable", "intolerable", "miserable",
+    "what is pmc", "pmc does", "bmc does", "authorities", "responsible",
+    "who is responsible", "take action", "please help", "help needed",
+    "anyone else", "same problem", "same issue", "facing this",
+    "my area", "our area", "our society", "our colony", "our ward",
+    "not working", "stopped working", "out of order", "no maintenance",
 ]
 
 # Send Telegram alert if this many items share a domain within 3 hours

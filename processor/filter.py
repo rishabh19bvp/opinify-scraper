@@ -1,18 +1,35 @@
+import re
 from config import CIVIC_KEYWORDS, DOMAIN_KEYWORDS, SCORE_WEIGHTS, COMPLAINT_SIGNALS
 
 
-def tag_and_score(text, source="unknown", upvotes=0, comments=0):
-    text_lower = text.lower()
+def _strip_html(text):
+    """Remove HTML tags and decode common entities."""
+    text = re.sub(r'<[^>]+>', ' ', text)
+    text = text.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"')
+    return re.sub(r'\s+', ' ', text).strip()
 
-    matched_civic = [kw for kw in CIVIC_KEYWORDS if kw in text_lower]
+
+def tag_and_score(text, source="unknown", upvotes=0, comments=0):
+    # Strip HTML first — Reddit RSS summaries are HTML blobs
+    clean = _strip_html(text)
+
+    # For Reddit use only the first 200 chars (title region) to avoid
+    # matching URL parameters and image alt text in the body blob
+    if source == "reddit-rss":
+        signal_text = clean[:200].lower()
+    else:
+        signal_text = clean.lower()
+
+    text_lower = clean.lower()
+
+    matched_civic = [kw for kw in CIVIC_KEYWORDS if kw in signal_text]
     if not matched_civic:
         return None
 
-    # For Reddit, require at least one complaint signal — filters out
-    # lifestyle/travel/food posts that merely mention a civic keyword
-    matched_signals = [s for s in COMPLAINT_SIGNALS if s in text_lower]
+    # Require complaint signal for Reddit — filters lifestyle/travel posts
+    matched_signals = [s for s in COMPLAINT_SIGNALS if s in signal_text]
     is_complaint = len(matched_signals) > 0
-    if source in ("reddit-rss",) and not is_complaint:
+    if source == "reddit-rss" and not is_complaint:
         return None
 
     domain = "general"
