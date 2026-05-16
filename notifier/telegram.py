@@ -14,7 +14,8 @@ DOMAIN_EMOJI = {
 }
 
 SOURCE_LABEL = {
-    "reddit-rss":          "Reddit",
+    "reddit-rss":          "Reddit 💬",
+    "quora":               "Quora 💬",
     "google-news":         "Google News",
     "toi-pune":            "Times of India",
     "ie-pune":             "Indian Express",
@@ -22,6 +23,9 @@ SOURCE_LABEL = {
     "Pune Mirror":         "Pune Mirror",
     "Maharashtra Times":   "Maharashtra Times",
 }
+
+# Sources where you can actually go and comment
+COMMENTABLE_SOURCES = {"reddit-rss", "quora"}
 
 
 def send_telegram(message):
@@ -73,27 +77,41 @@ def send_digest():
 
 
 def send_outreach_leads():
-    """Reddit complaint posts ready for outreach — reply with Opinify poll link."""
-    leads = get_unsent_leads(source_prefix="reddit", hours=8)
-    if not leads:
-        print("[Telegram] No new Reddit leads")
+    """Reddit + Quora posts for outreach — go comment with Opinify poll link."""
+    reddit_leads = get_unsent_leads(source_prefix="reddit", hours=8)
+    quora_leads  = get_unsent_leads(source_prefix="quora",  hours=24)
+    all_leads    = reddit_leads + quora_leads
+
+    if not all_leads:
+        print("[Telegram] No new outreach leads")
         return
 
-    ids     = [l[0] for l in leads]
-    message = "🎯 *Reddit Outreach Leads*\n"
-    message += f"_{len(leads)} people complaining about Pune civic issues_\n\n"
-    message += "Reply to each with the matching Opinify poll link:\n\n"
+    ids     = [l[0] for l in all_leads]
+    message = "🎯 *Outreach Leads — Go Comment*\n"
+    message += f"_Real people posting about Pune civic issues_\n\n"
 
-    for lead in leads[:6]:
-        _, title, url, domain = lead
-        emoji = DOMAIN_EMOJI.get(domain, "📌")
-        message += f"{emoji} [{title[:70]}]({url})\n"
-        message += (
-            f"↳ *Suggested reply:*\n"
-            f'_"Hey, we raised this exact issue on Opinify — more votes = more '
-            f'pressure on PMC to act. Would mean a lot: opinify.co.in"_\n\n'
-        )
+    if reddit_leads:
+        message += "*Reddit* (reply in thread):\n"
+        for lead in reddit_leads[:4]:
+            _, title, url, domain = lead
+            emoji = DOMAIN_EMOJI.get(domain, "📌")
+            message += f"{emoji} [{title[:65]}]({url})\n"
+        message += "\n"
+
+    if quora_leads:
+        message += "*Quora* (add an answer):\n"
+        for lead in quora_leads[:4]:
+            _, title, url, domain = lead
+            emoji = DOMAIN_EMOJI.get(domain, "📌")
+            message += f"{emoji} [{title[:65]}]({url})\n"
+        message += "\n"
+
+    message += (
+        "↳ *Suggested reply for both:*\n"
+        '_"We raised this on Opinify so Pune residents can vote collectively '
+        'and push PMC to act. More votes = more pressure: opinify.co.in"_'
+    )
 
     send_telegram(message)
     mark_leads_sent(ids)
-    print(f"[Telegram] Outreach leads sent: {len(leads)} posts")
+    print(f"[Telegram] Outreach leads sent: {len(reddit_leads)} Reddit + {len(quora_leads)} Quora")

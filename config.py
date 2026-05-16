@@ -67,11 +67,26 @@ SCORE_WEIGHTS = {
     "keyword_density": 0.1,
 }
 
-# Reddit public RSS — no API key required
+# Reddit feeds — subreddit new posts + site-wide civic complaint searches
 REDDIT_RSS_FEEDS = [
+    # r/pune — general but has complaints
     "https://www.reddit.com/r/pune/new.rss",
-    "https://www.reddit.com/r/pune/hot.rss",
-    "https://www.reddit.com/r/PMCPune/new.rss",
+    # Reddit-wide searches — catches posts across ALL subreddits mentioning Pune civic issues
+    "https://www.reddit.com/search.rss?q=pune+pothole&sort=new&t=week",
+    "https://www.reddit.com/search.rss?q=pune+pmc+complaint&sort=new&t=week",
+    "https://www.reddit.com/search.rss?q=pune+waterlogging&sort=new&t=week",
+    "https://www.reddit.com/search.rss?q=pune+garbage+problem&sort=new&t=week",
+    "https://www.reddit.com/search.rss?q=pune+pmpml&sort=new&t=week",
+    "https://www.reddit.com/search.rss?q=pune+worst+OR+pune+pathetic+OR+pune+broken&sort=new&t=week",
+    "https://www.reddit.com/search.rss?q=pcmc+OR+pmc+pune&sort=new&t=week",
+]
+
+# Quora via Google RSS — bypasses Cloudflare, finds real complaint threads
+QUORA_RSS_FEEDS = [
+    "https://news.google.com/rss/search?q=site:quora.com+pune+civic+problem&hl=en-IN&gl=IN&ceid=IN:en",
+    "https://news.google.com/rss/search?q=site:quora.com+pune+pmc&hl=en-IN&gl=IN&ceid=IN:en",
+    "https://news.google.com/rss/search?q=site:quora.com+pune+pothole+garbage+traffic&hl=en-IN&gl=IN&ceid=IN:en",
+    "https://news.google.com/rss/search?q=site:quora.com+pune+waterlogging+flood&hl=en-IN&gl=IN&ceid=IN:en",
 ]
 
 # Direct RSS feeds — news sites with Pune civic coverage
