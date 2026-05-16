@@ -1,0 +1,13 @@
+[Unit]
+Description=Opinify Civic Scraper
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/opinify/opinify-scraper
+ExecStart=/opt/opinify/opinify-scraper/venv/bin/python main.py
+Restart=always
+RestartSec=10
+EnvironmentFile=/opt/opinify/opinify-scraper/.env
+
+[Install]
+WantedBy=multi-user.target

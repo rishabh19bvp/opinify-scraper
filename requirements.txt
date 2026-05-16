@@ -1,0 +1,8 @@
+praw
+feedparser
+requests
+beautifulsoup4
+flask
+python-dotenv
+apscheduler
+python-telegram-bot
