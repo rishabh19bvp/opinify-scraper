@@ -4,7 +4,6 @@ load_dotenv()
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from db.models import init_db
-from scraper.reddit import scrape_reddit
 from scraper.rss import scrape_rss
 from scraper.news import scrape_news
 from notifier.telegram import check_and_alert
@@ -13,7 +12,6 @@ from api.digest import app
 
 def run_all_scrapers():
     print("\n--- Scraper run started ---")
-    scrape_reddit()
     scrape_rss()
     scrape_news()
     check_and_alert()

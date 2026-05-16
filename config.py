@@ -38,6 +38,13 @@ SCORE_WEIGHTS = {
     "keyword_density": 0.1,
 }
 
+# Reddit public RSS — no API key required
+REDDIT_RSS_FEEDS = [
+    "https://www.reddit.com/r/pune/new.rss",
+    "https://www.reddit.com/r/pune/hot.rss",
+    "https://www.reddit.com/r/PMCPune/new.rss",
+]
+
 RSS_QUERIES = [
     "PMC Pune",
     "Pune ward",
