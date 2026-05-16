@@ -28,6 +28,26 @@ DOMAIN_KEYWORDS = {
     "infrastructure": ["waterlogging", "flood", "drainage", "water supply", "electricity", "streetlight", "bridge", "pipeline"],
 }
 
+# Words that signal someone is frustrated/complaining (not just mentioning a topic)
+COMPLAINT_SIGNALS = [
+    # Frustration words
+    "terrible", "pathetic", "disgusting", "useless", "horrible", "shameful",
+    "worst", "absurd", "ridiculous", "unacceptable", "embarrassing", "disgrace",
+    # Time-based frustration
+    "months", "years", "still", "since", "waiting", "no action", "ignored",
+    "never fixed", "always", "every day", "every monsoon", "again",
+    # Direct complaint language
+    "complaint", "complain", "fix this", "why is", "why are", "when will",
+    "nobody", "no one", "nothing done", "helpless", "frustrated", "fed up",
+    "tired of", "sick of", "enough",
+    # Damage/danger words
+    "broken", "damaged", "collapsed", "dangerous", "accident", "injured",
+    "flooded", "overflowing", "blocked", "filthy", "stench", "garbage",
+    "open drain", "no water", "no electricity", "power cut", "water cut",
+    # Question/rant markers
+    "wtf", "seriously", "smh", "rant", "issue", "problem", "concern",
+]
+
 # Send Telegram alert if this many items share a domain within 3 hours
 SPIKE_THRESHOLD = 10
 

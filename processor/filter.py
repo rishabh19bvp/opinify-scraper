@@ -1,11 +1,18 @@
-from config import CIVIC_KEYWORDS, DOMAIN_KEYWORDS, SCORE_WEIGHTS
+from config import CIVIC_KEYWORDS, DOMAIN_KEYWORDS, SCORE_WEIGHTS, COMPLAINT_SIGNALS
 
 
 def tag_and_score(text, source="unknown", upvotes=0, comments=0):
     text_lower = text.lower()
 
-    matched = [kw for kw in CIVIC_KEYWORDS if kw in text_lower]
-    if not matched:
+    matched_civic = [kw for kw in CIVIC_KEYWORDS if kw in text_lower]
+    if not matched_civic:
+        return None
+
+    # For Reddit, require at least one complaint signal — filters out
+    # lifestyle/travel/food posts that merely mention a civic keyword
+    matched_signals = [s for s in COMPLAINT_SIGNALS if s in text_lower]
+    is_complaint = len(matched_signals) > 0
+    if source in ("reddit-rss",) and not is_complaint:
         return None
 
     domain = "general"
@@ -16,9 +23,9 @@ def tag_and_score(text, source="unknown", upvotes=0, comments=0):
             best_domain_count = hits
             domain = d
 
-    keyword_density = min(len(matched) / 10, 1.0)
-    upvote_score = min(upvotes / 100, 1.0) if source == "reddit" else 0.5
-    comment_score = min(comments / 50, 1.0) if source == "reddit" else 0.3
+    keyword_density = min(len(matched_civic) / 10, 1.0)
+    upvote_score  = min(upvotes / 100, 1.0) if source == "reddit-rss" else 0.5
+    comment_score = min(comments / 50, 1.0) if source == "reddit-rss" else 0.3
 
     score = (
         upvote_score    * SCORE_WEIGHTS["reddit_upvotes"] +
@@ -28,7 +35,8 @@ def tag_and_score(text, source="unknown", upvotes=0, comments=0):
     )
 
     return {
-        "domain":   domain,
-        "score":    round(score, 3),
-        "keywords": ",".join(matched[:5]),
+        "domain":       domain,
+        "score":        round(score, 3),
+        "keywords":     ",".join(matched_civic[:5]),
+        "is_complaint": is_complaint,   # True = real person complaining
     }

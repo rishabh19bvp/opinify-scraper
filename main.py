@@ -6,7 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from db.models import init_db
 from scraper.rss import scrape_rss
 from scraper.news import scrape_news
-from notifier.telegram import check_and_alert
+from notifier.telegram import check_and_alert, send_engagement_leads
 from api.digest import app
 
 
@@ -14,7 +14,8 @@ def run_all_scrapers():
     print("\n--- Scraper run started ---")
     scrape_rss()
     scrape_news()
-    check_and_alert()
+    send_engagement_leads()   # Reddit complaint posts → Telegram with links
+    check_and_alert()         # Spike alerts across all sources
     print("--- Scraper run complete ---\n")
 
 

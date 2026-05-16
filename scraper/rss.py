@@ -18,7 +18,7 @@ def _process_feed(url, source_label, headers=None):
         return 0
     for entry in feed.entries:
         text = f"{entry.title} {entry.get('summary', '')}"
-        result = tag_and_score(text, source="rss")
+        result = tag_and_score(text, source=source_label)
         if result:
             insert_item(
                 source=source_label,
@@ -28,6 +28,7 @@ def _process_feed(url, source_label, headers=None):
                 domain=result["domain"],
                 score=result["score"],
                 keywords=result["keywords"],
+                is_complaint=result.get("is_complaint", False),
             )
             count += 1
     return count
