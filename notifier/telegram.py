@@ -27,17 +27,18 @@ def check_and_alert():
     for domain in DOMAIN_KEYWORDS.keys():
         items = get_recent_by_domain(domain, hours=3)
         if len(items) >= SPIKE_THRESHOLD:
-            ids = [item[0] for item in items]
-            titles = [item[1] for item in items]
-            emoji = DOMAIN_EMOJI.get(domain, "📌")
+            ids    = [item[0] for item in items]
+            emoji  = DOMAIN_EMOJI.get(domain, "📌")
 
             message = (
                 f"{emoji} *Opinify Civic Spike — {domain.title()}*\n\n"
                 f"{len(items)} items in the last 3 hours\n\n"
                 f"*Top stories:*\n"
             )
-            for title in titles[:3]:
-                message += f"• {title[:80]}\n"
+            for item in items[:5]:
+                title = item[1][:70]
+                url   = item[2] or ""
+                message += f"• [{title}]({url})\n"
             message += f"\n💡 *Poll opportunity:* Consider launching a poll about {domain} in Pune today."
 
             send_telegram(message)
