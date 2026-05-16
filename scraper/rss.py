@@ -4,21 +4,18 @@ from config import RSS_QUERIES, REDDIT_RSS_FEEDS, DIRECT_RSS_FEEDS
 from processor.filter import tag_and_score
 from db.models import insert_item
 
-REDDIT_HEADERS = {"User-Agent": "opinify-scraper/1.0 by rishabh19bvp"}
+DEFAULT_HEADERS = {"User-Agent": "opinify-scraper/1.0 by rishabh19bvp"}
 
 
 def _process_feed(url, source_label, headers=None):
     count = 0
-    # Use requests for custom headers (feedparser ignores them on some versions)
-    if headers:
-        try:
-            resp = requests.get(url, headers=headers, timeout=10)
-            feed = feedparser.parse(resp.content)
-        except Exception as e:
-            print(f"[{source_label}] Fetch error: {e}")
-            return 0
-    else:
-        feed = feedparser.parse(url, agent="opinify-scraper/1.0")
+    try:
+        resp = requests.get(url, headers=headers or DEFAULT_HEADERS, timeout=10)
+        resp.raise_for_status()
+        feed = feedparser.parse(resp.content)
+    except Exception as e:
+        print(f"[{source_label}] Fetch error: {e}")
+        return 0
     for entry in feed.entries:
         text = f"{entry.title} {entry.get('summary', '')}"
         result = tag_and_score(text, source="rss")
@@ -48,7 +45,7 @@ def scrape_rss():
     # Reddit public RSS — proper user-agent required
     reddit_count = 0
     for feed_url in REDDIT_RSS_FEEDS:
-        reddit_count += _process_feed(feed_url, "reddit-rss", headers=REDDIT_HEADERS)
+        reddit_count += _process_feed(feed_url, "reddit-rss")
     print(f"[Reddit RSS] {reddit_count} civic items stored")
 
     # Direct RSS feeds (ToI, IE, Sakal, etc.)
