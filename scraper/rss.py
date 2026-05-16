@@ -1,15 +1,24 @@
 import feedparser
+import requests
 from config import RSS_QUERIES, REDDIT_RSS_FEEDS, DIRECT_RSS_FEEDS
 from processor.filter import tag_and_score
 from db.models import insert_item
 
-# Reddit requires a real user-agent or returns 429
 REDDIT_HEADERS = {"User-Agent": "opinify-scraper/1.0 by rishabh19bvp"}
 
 
 def _process_feed(url, source_label, headers=None):
     count = 0
-    feed = feedparser.parse(url, request_headers=headers or {})
+    # Use requests for custom headers (feedparser ignores them on some versions)
+    if headers:
+        try:
+            resp = requests.get(url, headers=headers, timeout=10)
+            feed = feedparser.parse(resp.content)
+        except Exception as e:
+            print(f"[{source_label}] Fetch error: {e}")
+            return 0
+    else:
+        feed = feedparser.parse(url, agent="opinify-scraper/1.0")
     for entry in feed.entries:
         text = f"{entry.title} {entry.get('summary', '')}"
         result = tag_and_score(text, source="rss")
