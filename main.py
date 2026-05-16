@@ -6,26 +6,43 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from db.models import init_db
 from scraper.rss import scrape_rss
 from scraper.news import scrape_news
-from notifier.telegram import check_and_alert, send_engagement_leads
+from notifier.telegram import send_digest, send_outreach_leads
 from api.digest import app
 
 
-def run_all_scrapers():
+def run_scrapers():
+    """Hourly — scrape all sources, store new items."""
     print("\n--- Scraper run started ---")
     scrape_rss()
     scrape_news()
-    send_engagement_leads()   # Reddit complaint posts → Telegram with links
-    check_and_alert()         # Spike alerts across all sources
     print("--- Scraper run complete ---\n")
+
+
+def run_digest():
+    """3x daily — send Telegram digest + outreach leads."""
+    print("\n--- Digest run ---")
+    send_digest()
+    send_outreach_leads()
+    print("--- Digest done ---\n")
 
 
 if __name__ == "__main__":
     init_db()
 
-    run_all_scrapers()
+    # Run immediately on startup
+    run_scrapers()
+    run_digest()
 
     scheduler = BackgroundScheduler()
-    scheduler.add_job(run_all_scrapers, "interval", hours=1)
+
+    # Scrape every hour
+    scheduler.add_job(run_scrapers, "interval", hours=1, id="scraper")
+
+    # Digest at 8am, 2pm, 9pm IST (IST = UTC+5:30, so UTC 2:30, 8:30, 15:30)
+    scheduler.add_job(run_digest, "cron", hour=2,  minute=30, id="digest_morning")
+    scheduler.add_job(run_digest, "cron", hour=8,  minute=30, id="digest_afternoon")
+    scheduler.add_job(run_digest, "cron", hour=15, minute=30, id="digest_evening")
+
     scheduler.start()
 
     port = int(os.getenv("FLASK_PORT", 5050))

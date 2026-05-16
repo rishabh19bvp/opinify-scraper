@@ -92,6 +92,31 @@ def get_today_top(limit=5):
     return [{"title": r[0], "url": r[1], "domain": r[2], "score": round(r[3], 2), "source": r[4]} for r in rows]
 
 
+def get_digest_items(hours=8, limit_per_domain=4):
+    """Items from last N hours grouped by domain — for digest messages."""
+    conn = sqlite3.connect(DB_PATH)
+    cutoff = (datetime.utcnow() - timedelta(hours=hours)).isoformat()
+    rows = conn.execute("""
+        SELECT id, title, url, domain, source, score
+        FROM items
+        WHERE scraped_at > ?
+        ORDER BY domain, score DESC
+    """, (cutoff,)).fetchall()
+    conn.close()
+
+    grouped = {}
+    seen_per_domain = {}
+    for row in rows:
+        id_, title, url, domain, source, score = row
+        if domain not in grouped:
+            grouped[domain] = []
+            seen_per_domain[domain] = 0
+        if seen_per_domain[domain] < limit_per_domain:
+            grouped[domain].append((id_, title, url, source))
+            seen_per_domain[domain] += 1
+    return grouped
+
+
 def get_recent_by_domain(domain, hours=3):
     conn = sqlite3.connect(DB_PATH)
     cutoff = (datetime.utcnow() - timedelta(hours=hours)).isoformat()
