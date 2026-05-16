@@ -1,6 +1,6 @@
 import feedparser
 import requests
-from config import RSS_QUERIES, REDDIT_RSS_FEEDS, DIRECT_RSS_FEEDS, QUORA_RSS_FEEDS
+from config import RSS_QUERIES, REDDIT_RSS_FEEDS, DIRECT_RSS_FEEDS
 from processor.filter import tag_and_score
 from db.models import insert_item
 
@@ -55,10 +55,4 @@ def scrape_rss():
         direct_count += _process_feed(feed["url"], feed["name"])
     print(f"[Direct RSS] {direct_count} civic items stored")
 
-    # Quora via Google RSS — real people's civic questions, commentable
-    quora_count = 0
-    for feed_url in QUORA_RSS_FEEDS:
-        quora_count += _process_feed(feed_url, "quora")
-    print(f"[Quora RSS] {quora_count} civic items stored")
-
-    return count + reddit_count + direct_count + quora_count
+    return count + reddit_count + direct_count

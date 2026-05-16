@@ -81,13 +81,11 @@ REDDIT_RSS_FEEDS = [
     "https://www.reddit.com/search.rss?q=pcmc+OR+pmc+pune&sort=new&t=week",
 ]
 
-# Quora via Google RSS — bypasses Cloudflare, finds real complaint threads
-QUORA_RSS_FEEDS = [
-    "https://news.google.com/rss/search?q=site:quora.com+pune+civic+problem&hl=en-IN&gl=IN&ceid=IN:en",
-    "https://news.google.com/rss/search?q=site:quora.com+pune+pmc&hl=en-IN&gl=IN&ceid=IN:en",
-    "https://news.google.com/rss/search?q=site:quora.com+pune+pothole+garbage+traffic&hl=en-IN&gl=IN&ceid=IN:en",
-    "https://news.google.com/rss/search?q=site:quora.com+pune+waterlogging+flood&hl=en-IN&gl=IN&ceid=IN:en",
-]
+# Twitter/X manual monitoring — team checks these URLs daily, no scraping needed
+# twitter.com/search?q=pune+pothole&f=live
+# twitter.com/search?q=PMCPune&f=live
+# twitter.com/search?q=%23AamchiPune&f=live
+# twitter.com/search?q=pune+pmpml+complaint&f=live
 
 # Direct RSS feeds — news sites with Pune civic coverage
 DIRECT_RSS_FEEDS = [
