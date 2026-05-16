@@ -1,12 +1,15 @@
 import feedparser
-from config import RSS_QUERIES, REDDIT_RSS_FEEDS
+from config import RSS_QUERIES, REDDIT_RSS_FEEDS, DIRECT_RSS_FEEDS
 from processor.filter import tag_and_score
 from db.models import insert_item
 
+# Reddit requires a real user-agent or returns 429
+REDDIT_HEADERS = {"User-Agent": "opinify-scraper/1.0 by rishabh19bvp"}
 
-def _process_feed(url, source_label):
+
+def _process_feed(url, source_label, headers=None):
     count = 0
-    feed = feedparser.parse(url)
+    feed = feedparser.parse(url, request_headers=headers or {})
     for entry in feed.entries:
         text = f"{entry.title} {entry.get('summary', '')}"
         result = tag_and_score(text, source="rss")
@@ -33,10 +36,16 @@ def scrape_rss():
         count += _process_feed(url, "google-news")
     print(f"[Google News RSS] {count} civic items stored")
 
-    # Reddit public RSS — no API key needed
+    # Reddit public RSS — proper user-agent required
     reddit_count = 0
     for feed_url in REDDIT_RSS_FEEDS:
-        reddit_count += _process_feed(feed_url, "reddit-rss")
+        reddit_count += _process_feed(feed_url, "reddit-rss", headers=REDDIT_HEADERS)
     print(f"[Reddit RSS] {reddit_count} civic items stored")
 
-    return count + reddit_count
+    # Direct RSS feeds (ToI, IE, Sakal, etc.)
+    direct_count = 0
+    for feed in DIRECT_RSS_FEEDS:
+        direct_count += _process_feed(feed["url"], feed["name"])
+    print(f"[Direct RSS] {direct_count} civic items stored")
+
+    return count + reddit_count + direct_count

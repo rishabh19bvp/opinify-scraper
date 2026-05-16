@@ -45,6 +45,14 @@ REDDIT_RSS_FEEDS = [
     "https://www.reddit.com/r/PMCPune/new.rss",
 ]
 
+# Direct RSS feeds — news sites with Pune civic coverage
+DIRECT_RSS_FEEDS = [
+    {"name": "toi-pune",       "url": "https://timesofindia.indiatimes.com/rssfeeds/7503928.cms"},
+    {"name": "ie-pune",        "url": "https://indianexpress.com/section/cities/pune/feed/"},
+    {"name": "hindustan-times-pune", "url": "https://www.hindustantimes.com/feeds/rss/cities/pune/rssfeed.xml"},
+    {"name": "sakal-pune",     "url": "https://www.sakaaltimes.com/rss/pune"},
+]
+
 RSS_QUERIES = [
     "PMC Pune",
     "Pune ward",
