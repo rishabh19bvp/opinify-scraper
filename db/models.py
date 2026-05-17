@@ -59,13 +59,14 @@ def insert_item(source, title, url, body, domain, score, upvotes=0, comments=0, 
 
 
 def get_unsent_leads(source_prefix="reddit", hours=6):
-    """Fresh complaint posts not yet sent as engagement leads."""
+    """Fresh complaint posts not yet sent — deduped by URL."""
     conn = sqlite3.connect(DB_PATH)
     cutoff = (datetime.utcnow() - timedelta(hours=hours)).isoformat()
     rows = conn.execute("""
-        SELECT id, title, url, domain FROM items
+        SELECT MIN(id), title, url, domain FROM items
         WHERE source LIKE ? AND is_complaint = 1 AND lead_sent = 0 AND scraped_at > ?
-        ORDER BY scraped_at DESC
+        GROUP BY url
+        ORDER BY MIN(scraped_at) DESC
     """, (f"{source_prefix}%", cutoff)).fetchall()
     conn.close()
     return rows
@@ -100,6 +101,7 @@ def get_digest_items(hours=8, limit_per_domain=4):
         SELECT id, title, url, domain, source, score
         FROM items
         WHERE scraped_at > ?
+          AND source != 'quora'
         ORDER BY domain, score DESC
     """, (cutoff,)).fetchall()
     conn.close()

@@ -26,9 +26,10 @@ def tag_and_score(text, source="unknown", upvotes=0, comments=0):
     if not matched_civic:
         return None
 
-    # Require complaint signal for Reddit — filters lifestyle/travel posts
+    # Reddit: require 2+ complaint signals — 1 signal too many false positives
+    # e.g. "civil court metro" matches "metro" (civic) + "civil"≠complaint signal
     matched_signals = [s for s in COMPLAINT_SIGNALS if s in signal_text]
-    is_complaint = len(matched_signals) > 0
+    is_complaint = len(matched_signals) >= 2
     if source == "reddit-rss" and not is_complaint:
         return None
 
